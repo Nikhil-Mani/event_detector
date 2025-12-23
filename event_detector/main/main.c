@@ -15,7 +15,7 @@
 void init() {
   init_gpio();
   init_wifi();
-  init_http();
+  // init_http();
 }
 
 void app_main(void) {

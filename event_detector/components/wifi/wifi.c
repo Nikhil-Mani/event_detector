@@ -30,7 +30,7 @@ static EventGroupHandle_t s_wifi_event_group;
 #define ESP_WIFI_SAE_MODE WPA3_SAE_PWE_BOTH
 #define EXAMPLE_H2E_IDENTIFIER CONFIG_ESP_WIFI_PW_ID
 #endif
-#define ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD WIFI_AUTH_WPA2_WPA3_PSK
+#define ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD WIFI_AUTH_WPA2_PSK
 
 /* FreeRTOS event group to signal when we are connected*/
 
