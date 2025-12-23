@@ -5,7 +5,6 @@
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "led_strip.h"
 #include "sdkconfig.h"
 #include <http-client.h>
 #include <sonar.h>
