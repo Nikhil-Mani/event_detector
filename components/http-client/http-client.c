@@ -1,10 +1,16 @@
 #include "http-client.h"
 #include "esp_http_client.h"
+#include "esp_log.h"
+#include "esp_tls.h"
 #include <stdio.h>
 
 #define MAX_HTTP_RECV_BUFFER 512
 #define MAX_HTTP_OUTPUT_BUFFER 2048
 
+#ifndef MIN
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif
+static const char *TAG = "HTTP Client";
 char *endpoint = "https://example.com/";
 
 esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
@@ -25,7 +31,7 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
     ESP_LOGD(TAG, "HTTP_EVENT_ON_HEADER, key=%s, value=%s", evt->header_key,
              evt->header_value);
     break;
-  case HTPP_EVENT_ON_DATA:
+  case HTTP_EVENT_ON_DATA:
     if (output_len == 0 && evt->user_data) {
       memset(evt->user_data, 0, MAX_HTTP_OUTPUT_BUFFER);
     }
@@ -60,14 +66,42 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
       output_len += copy_len;
     }
     break;
+  case HTTP_EVENT_ON_FINISH:
+    if (output_buffer != NULL) {
+      free(output_buffer);
+      output_buffer = NULL;
+    }
+    output_len = 0;
+    break;
+  case HTTP_EVENT_DISCONNECTED:
+    ESP_LOGI(TAG, "HTTP_EVENT_DISCONNECTED");
+    int mbedtls_err = 0;
+    esp_err_t err = esp_tls_get_and_clear_last_error(
+        (esp_tls_error_handle_t)evt->data, &mbedtls_err, NULL);
+    if (err != 0) {
+      ESP_LOGI(TAG, "Last esp error code: 0x%x", err);
+      ESP_LOGI(TAG, "Last mbedtls failure: 0x%x", mbedtls_err);
+    }
+    if (output_buffer != NULL) {
+      free(output_buffer);
+      output_buffer = NULL;
+    }
+    output_len = 0;
+    break;
+  case HTTP_EVENT_REDIRECT:
+    ESP_LOGD(TAG, "HTTP_EVENT_REDIRECT");
+    esp_http_client_set_header(evt->client, "From", "user@example.com");
+    esp_http_client_set_header(evt->client, "Accept", "text/html");
+    esp_http_client_set_redirection(evt->client);
+    break;
   }
+  return ESP_OK;
 }
 
 void init_http(void) {
-
   char local_response_buffer[MAX_HTTP_OUTPUT_BUFFER + 1] = {0};
   esp_http_client_config_t config = {
-      .host = &endpoint,
+      .host = endpoint,
       .path = "/get",
       .query = "esp",
       .event_handler = _http_event_handler,

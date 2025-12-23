@@ -7,14 +7,16 @@
 #include "freertos/task.h"
 #include "led_strip.h"
 #include "sdkconfig.h"
+#include <http-client.h>
 #include <sonar.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <wifi.h>
 
 void init() {
-  // init_gpio();
+  init_gpio();
   init_wifi();
+  init_http();
 }
 
 void app_main(void) {
