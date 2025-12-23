@@ -6,6 +6,9 @@
 
 #define MAX_HTTP_RECV_BUFFER 512
 #define MAX_HTTP_OUTPUT_BUFFER 2048
+#define SERVER_URL "http://192.168.1.186:5001"
+#define POST 0
+#define GET 1
 
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -98,11 +101,10 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
   return ESP_OK;
 }
 
-void init_http(void) {
+esp_err_t get_request(void) {
   static char local_response_buffer[MAX_HTTP_OUTPUT_BUFFER + 1] = {0};
   esp_http_client_config_t config = {
-      .url = "http://192.168.1.186:5001",
-      .path = "/get",
+      .url = SERVER_URL "/get",
       .query = "esp",
       .event_handler = _http_event_handler,
       .user_data =
@@ -122,4 +124,36 @@ void init_http(void) {
     ESP_LOGE(TAG, "HTTP GET request failed: %s", esp_err_to_name(ret));
   }
   ESP_LOG_BUFFER_HEX(TAG, local_response_buffer, strlen(local_response_buffer));
+
+  esp_http_client_cleanup(client);
+  return ret;
+}
+
+esp_http_client_config_t init_post(void) {
+  esp_http_client_config_t config = {
+      .url = SERVER_URL "/post",
+      .event_handler = _http_event_handler,
+      .method = HTTP_METHOD_POST,
+      .disable_auto_redirect = true,
+  };
+  ESP_LOGI(TAG, "HTTP request with url =>");
+  esp_http_client_handle_t client = esp_http_client_init(&config);
+
+  esp_http_client_set_header(client, "Content-Type", "application/json");
+  return client;
+}
+esp_err_t post_request(char *post_data) {
+
+  esp_http_client_config_t client = init_post();
+  esp_http_client_set_post_field(client, post_data, strlen(post_data));
+  esp_err_t ret = esp_http_client_perform(client);
+  if (ret == ESP_OK) {
+    ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %" PRId64,
+             esp_http_client_get_status_code(client),
+             esp_http_client_get_content_length(client));
+  } else {
+    ESP_LOGE(TAG, "HTTP POST request failed: %s", esp_err_to_name(ret));
+  }
+  esp_http_client_cleanup(client);
+  return ret;
 }

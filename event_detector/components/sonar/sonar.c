@@ -52,7 +52,8 @@ void init_gpio(void) {
   configure_interrupt();
 }
 
-esp_err_t sonar_run(int64_t *duration) {
+esp_err_t sonar_run(float *distance_cm) {
+  int64_t duration;
   echo_done = false;
   // set trig low (reset)
   gpio_set_level(TRIG, 0);
@@ -69,9 +70,9 @@ esp_err_t sonar_run(int64_t *duration) {
     }
     vTaskDelay(1);
   }
-  *duration = echo_end - echo_start;
-  float distance_cm = *duration * SOUND_SPEED / 2;
-  ESP_LOGI("example", "Distance in centimeters is: %f", distance_cm);
+  duration = echo_end - echo_start;
+  *distance_cm = duration * SOUND_SPEED / 2;
+  ESP_LOGI("example", "Distance in centimeters is: %f", *distance_cm);
   return ESP_OK;
 }
 // finish function
