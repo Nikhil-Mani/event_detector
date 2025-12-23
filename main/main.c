@@ -10,10 +10,16 @@
 #include <sonar.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <wifi.h>
+
+void init() {
+  // init_gpio();
+  init_wifi();
+}
 
 void app_main(void) {
   vTaskDelay(1);
-  init_gpio();
+  init();
   int64_t duration;
   esp_err_t ret;
   for (int i = 0; i < 300; i++) {

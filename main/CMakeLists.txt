@@ -1,3 +1,3 @@
 idf_component_register(SRCS "main.c"
                        INCLUDE_DIRS "."
-                       REQUIRES sonar esp_timer)
+                       REQUIRES sonar wifi esp_timer)
