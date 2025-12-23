@@ -15,15 +15,15 @@
 void init() {
   init_gpio();
   init_wifi();
-  // init_http();
+  init_http();
 }
 
 void app_main(void) {
   vTaskDelay(1);
   init();
-  int64_t duration;
-  esp_err_t ret;
-  for (int i = 0; i < 300; i++) {
-    ret = sonar_run(&duration);
-  }
+  // int64_t duration;
+  // esp_err_t ret;
+  // for (int i = 0; i < 300; i++) {
+  //   ret = sonar_run(&duration);
+  // }
 }

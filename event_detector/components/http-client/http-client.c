@@ -11,7 +11,7 @@
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
 static const char *TAG = "HTTP Client";
-char *endpoint = "https://example.com/";
+char *endpoint = "example.com";
 
 esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
   static char *output_buffer;
@@ -99,9 +99,9 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt) {
 }
 
 void init_http(void) {
-  char local_response_buffer[MAX_HTTP_OUTPUT_BUFFER + 1] = {0};
+  static char local_response_buffer[MAX_HTTP_OUTPUT_BUFFER + 1] = {0};
   esp_http_client_config_t config = {
-      .host = endpoint,
+      .url = "http://192.168.1.186:5001",
       .path = "/get",
       .query = "esp",
       .event_handler = _http_event_handler,
