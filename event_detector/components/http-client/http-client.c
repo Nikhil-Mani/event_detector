@@ -129,31 +129,32 @@ esp_err_t get_request(void) {
   return ret;
 }
 
-esp_http_client_config_t init_post(void) {
+esp_http_client_handle_t init_post(void) {
   esp_http_client_config_t config = {
       .url = SERVER_URL "/post",
       .event_handler = _http_event_handler,
       .method = HTTP_METHOD_POST,
       .disable_auto_redirect = true,
   };
-  ESP_LOGI(TAG, "HTTP request with url =>");
+  ESP_LOGI(TAG, "HTTP POST in JSON format");
   esp_http_client_handle_t client = esp_http_client_init(&config);
 
   esp_http_client_set_header(client, "Content-Type", "application/json");
   return client;
 }
-esp_err_t post_request(char *post_data) {
+void post_request(void *pvParameters) {
+  char *post_data = ((struct httpRequest *)pvParameters)->post_data;
+  esp_http_client_handle_t *client =
+      ((struct httpRequest *)pvParameters)->client;
+  char *post_req = "shit here";
 
-  esp_http_client_config_t client = init_post();
-  esp_http_client_set_post_field(client, post_data, strlen(post_data));
-  esp_err_t ret = esp_http_client_perform(client);
+  esp_http_client_set_post_field(*client, post_req, strlen(post_data));
+  esp_err_t ret = esp_http_client_perform(*client);
   if (ret == ESP_OK) {
     ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %" PRId64,
-             esp_http_client_get_status_code(client),
-             esp_http_client_get_content_length(client));
+             esp_http_client_get_status_code(*client),
+             esp_http_client_get_content_length(*client));
   } else {
     ESP_LOGE(TAG, "HTTP POST request failed: %s", esp_err_to_name(ret));
   }
-  esp_http_client_cleanup(client);
-  return ret;
 }
