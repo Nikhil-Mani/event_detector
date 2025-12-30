@@ -19,7 +19,7 @@ esp_http_client_handle_t init() {
 }
 
 void sensor_read(void *pvParameter) {
-  for (int i = 0; i < 30; i++) {
+  for (;;) {
     float distance_cm;
     sonar_run(&distance_cm);
     // add function that does the erro cehcking thing here
@@ -33,16 +33,14 @@ void app_main(void) {
   esp_http_client_handle_t client = init();
   char *post_data = "shit here";
   struct httpRequest *req = malloc(sizeof(struct httpRequest));
-  req->client = &client;
+  req->client = client;
   req->post_data = post_data;
   vTaskDelay(1);
-  xTaskCreate(sensor_read, "sensor", 4096, NULL, 1, NULL);
-  // also want this task, not sure how to format this but wtv
+  // xTaskCreate(sensor_read, "sensor", 4096, NULL, 1, NULL);
+  //  also want this task, not sure how to format this but wtv
 
-  xTaskCreate(post_request, "post", 4096, req, 1,
-              NULL); // make sure to remove the return type and itll compile
-  // int64_t duration;
-  // esp_err_t ret;
+  xTaskCreate(post_request, "post", 4096, req, 1, NULL); // make sure to
+  // remove the return type and itll compile int64_t duration; esp_err_t ret;
   // for (int i = 0; i < 300; i++) {
   //   ret = sonar_run(&duration);
   // }

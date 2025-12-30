@@ -143,18 +143,20 @@ esp_http_client_handle_t init_post(void) {
   return client;
 }
 void post_request(void *pvParameters) {
-  char *post_data = ((struct httpRequest *)pvParameters)->post_data;
-  esp_http_client_handle_t *client =
-      ((struct httpRequest *)pvParameters)->client;
+  struct httpRequest *req = (struct httpRequest *)pvParameters;
+  char *post_data = req->post_data;
+  esp_http_client_handle_t client = req->client;
   char *post_req = "shit here";
 
-  esp_http_client_set_post_field(*client, post_req, strlen(post_data));
-  esp_err_t ret = esp_http_client_perform(*client);
+  esp_http_client_set_post_field(client, post_req, strlen(post_data));
+  esp_err_t ret = esp_http_client_perform(client);
   if (ret == ESP_OK) {
     ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %" PRId64,
-             esp_http_client_get_status_code(*client),
-             esp_http_client_get_content_length(*client));
+             esp_http_client_get_status_code(client),
+             esp_http_client_get_content_length(client));
   } else {
     ESP_LOGE(TAG, "HTTP POST request failed: %s", esp_err_to_name(ret));
   }
+  free(req);
+  // make sure to free the http request struct here
 }
