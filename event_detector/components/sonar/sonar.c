@@ -24,7 +24,9 @@ static void gpio_isr_handler(void *arg) {
   }
 }
 void configure_gpios(void) {
+
   gpio_config_t echo_config = {};
+
   echo_config.pin_bit_mask = (1ULL << ECHO);
   echo_config.mode = GPIO_MODE_INPUT;
   echo_config.pull_up_en = GPIO_PULLUP_DISABLE;
@@ -63,13 +65,19 @@ esp_err_t sonar_run(float *distance_cm) {
   esp_rom_delay_us(10);
   // set low again
   gpio_set_level(TRIG, 0);
-  int64_t timeout = esp_timer_get_time() + 40000;
+
+  int64_t timeout = esp_timer_get_time + 40000;
   while (!echo_done) {
-    if (esp_timer_get_time() > timeout) {
+    if (gettimeofday() > timeout) {
       return ESP_ERR_TIMEOUT;
     }
     vTaskDelay(1);
   }
+  // timeval not delcared, json not formatted!
+  struct timeval cur_time;
+  gettimeofday(&cur_time, NULL);
+  int64_t timeout =
+      (uint64_t)cur_time.tv_sec * 1000000L + (uint64_t)cur_time.tv_usec;
   duration = echo_end - echo_start;
   *distance_cm = duration * SOUND_SPEED / 2;
   ESP_LOGI("example", "Distance in centimeters is: %f", *distance_cm);

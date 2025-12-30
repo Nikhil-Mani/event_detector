@@ -129,7 +129,7 @@ esp_err_t get_request(void) {
   return ret;
 }
 
-esp_http_client_handle_t init_post(void) {
+struct httpRequest *init_post(int logs_before_post) {
   esp_http_client_config_t config = {
       .url = SERVER_URL "/post",
       .event_handler = _http_event_handler,
@@ -138,14 +138,19 @@ esp_http_client_handle_t init_post(void) {
   };
   ESP_LOGI(TAG, "HTTP POST in JSON format");
   esp_http_client_handle_t client = esp_http_client_init(&config);
-
   esp_http_client_set_header(client, "Content-Type", "application/json");
-  return client;
+
+  struct httpRequest *req = malloc(sizeof(struct httpRequest));
+  req->client = client;
+  req->logs_before_post = logs_before_post;
+  return req;
 }
 void post_request(void *pvParameters) {
   struct httpRequest *req = (struct httpRequest *)pvParameters;
   char *post_data = req->post_data;
   esp_http_client_handle_t client = req->client;
+  int log_num = req->logs_before_post;
+
   char *post_req = "shit here";
 
   esp_http_client_set_post_field(client, post_req, strlen(post_data));
@@ -158,5 +163,5 @@ void post_request(void *pvParameters) {
     ESP_LOGE(TAG, "HTTP POST request failed: %s", esp_err_to_name(ret));
   }
   free(req);
-  // make sure to free the http request struct here
+  vTaskDelete(NULL);
 }
