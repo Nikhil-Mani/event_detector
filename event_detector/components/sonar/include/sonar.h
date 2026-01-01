@@ -2,10 +2,11 @@
 #define SONAR_H
 
 #include "esp_err.h"
+#include <sys/time.h>
 
 void configure_gpios(void);
 void configure_interrupt(void);
 void init_gpio(void);
-esp_err_t sonar_run(float *distance_cm);
+esp_err_t sonar_run(float *distance_cm, int64_t *time);
 
 #endif

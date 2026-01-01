@@ -54,7 +54,7 @@ void init_gpio(void) {
   configure_interrupt();
 }
 
-esp_err_t sonar_run(float *distance_cm) {
+esp_err_t sonar_run(float *distance_cm, int64_t *time) {
   int64_t duration;
   echo_done = false;
   // set trig low (reset)
@@ -66,21 +66,20 @@ esp_err_t sonar_run(float *distance_cm) {
   // set low again
   gpio_set_level(TRIG, 0);
 
-  int64_t timeout = esp_timer_get_time + 40000;
+  int64_t timeout = esp_timer_get_time() + 40000;
   while (!echo_done) {
-    if (gettimeofday() > timeout) {
+    if (esp_timer_get_time() > timeout) {
       return ESP_ERR_TIMEOUT;
     }
     vTaskDelay(1);
   }
-  // timeval not delcared, json not formatted!
+  //  json not formatted!
   struct timeval cur_time;
   gettimeofday(&cur_time, NULL);
-  int64_t timeout =
-      (uint64_t)cur_time.tv_sec * 1000000L + (uint64_t)cur_time.tv_usec;
+  int64_t t = (uint64_t)cur_time.tv_sec * 1000000L + (uint64_t)cur_time.tv_usec;
   duration = echo_end - echo_start;
+  *time = t;
   *distance_cm = duration * SOUND_SPEED / 2;
-  ESP_LOGI("example", "Distance in centimeters is: %f", *distance_cm);
+  // ESP_LOGI("example", "Distance in centimeters is: %f", *distance_cm);
   return ESP_OK;
 }
-// finish function

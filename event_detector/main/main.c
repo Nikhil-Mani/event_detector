@@ -12,8 +12,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define LOGS_BEFORE_POST 5
-
 struct httpRequest *init() {
   init_gpio();
   init_wifi();
@@ -22,22 +20,30 @@ struct httpRequest *init() {
 
 void sensor_read(void *pvParameter) {
   struct httpRequest *req = init(LOGS_BEFORE_POST);
+  float distances[LOGS_BEFORE_POST];
+  int64_t times[LOGS_BEFORE_POST];
+  TaskHandle_t t = xTaskGetCurrentTaskHandle();
 
-  for (int i = 0; i < 30; i++) {
-    float distance_cm;
-    sonar_run(&distance_cm);
-    // add function that does the erro cehcking thing here
-    char char_array[8];
-    sprintf(char_array, "%.3f", distance_cm);
-    if (i % LOGS_BEFORE_POST == 0 && i > 0) {
+  req->parent_task = t;
+  for (int i = 1; i < 30; i++) {
+    float distance;
+    int64_t time;
+    ESP_ERROR_CHECK(sonar_run(&distance, &time));
+
+    distances[i - 1] = distance;
+    times[i - 1] = time;
+    if (i % LOGS_BEFORE_POST == 0) {
+      memcpy(req->sonar_data, distances, LOGS_BEFORE_POST * sizeof(float));
+      memcpy(req->time, times, LOGS_BEFORE_POST * sizeof(int64_t));
       xTaskCreate(post_request, "post", 4096, req, 1, NULL);
+      ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
   }
+  free(req);
   vTaskDelete(NULL);
 }
 
 void app_main(void) {
-
   vTaskDelay(1);
   xTaskCreate(sensor_read, "sensor", 4096, NULL, 1, NULL);
   //  also want this task, not sure how to format this but wtv

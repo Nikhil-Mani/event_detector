@@ -128,7 +128,7 @@ esp_err_t get_request(void) {
   esp_http_client_cleanup(client);
   return ret;
 }
-
+char *format_json(char *data) { return "hi"; }
 struct httpRequest *init_post(int logs_before_post) {
   esp_http_client_config_t config = {
       .url = SERVER_URL "/post",
@@ -142,18 +142,17 @@ struct httpRequest *init_post(int logs_before_post) {
 
   struct httpRequest *req = malloc(sizeof(struct httpRequest));
   req->client = client;
-  req->logs_before_post = logs_before_post;
   return req;
 }
 void post_request(void *pvParameters) {
   struct httpRequest *req = (struct httpRequest *)pvParameters;
-  char *post_data = req->post_data;
+  // char *post_data = req->post_data;
   esp_http_client_handle_t client = req->client;
-  int log_num = req->logs_before_post;
-
+  // now can call the json formatting function and format data
+  // for reference the function to get json obj into string is cJSON_Print
   char *post_req = "shit here";
 
-  esp_http_client_set_post_field(client, post_req, strlen(post_data));
+  esp_http_client_set_post_field(client, post_req, strlen(post_req));
   esp_err_t ret = esp_http_client_perform(client);
   if (ret == ESP_OK) {
     ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %" PRId64,
@@ -162,6 +161,6 @@ void post_request(void *pvParameters) {
   } else {
     ESP_LOGE(TAG, "HTTP POST request failed: %s", esp_err_to_name(ret));
   }
-  free(req);
+  xTaskNotifyGive(req->parent_task);
   vTaskDelete(NULL);
 }
