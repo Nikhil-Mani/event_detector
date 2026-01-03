@@ -10,9 +10,11 @@ def hello_world():
 @app.route('/post', methods=['POST'])
 def recv_data():
     data = request.get_json()
+    print(data, flush=True)
+    print('hi')
     if data is None:
         return jsonify({"error": "Invalid JSON"}), 400
-    print(data)
+    return "yay"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
