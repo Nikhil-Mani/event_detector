@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
+static const char *TAG = "Main";
 struct httpRequest *init() {
   init_gpio();
   init_wifi();
@@ -19,7 +20,7 @@ struct httpRequest *init() {
 }
 
 void sensor_read(void *pvParameter) {
-  struct httpRequest *req = init(LOGS_BEFORE_POST);
+  struct httpRequest *req = init();
   float distances[LOGS_BEFORE_POST];
   int64_t times[LOGS_BEFORE_POST];
   TaskHandle_t t = xTaskGetCurrentTaskHandle();
@@ -30,8 +31,8 @@ void sensor_read(void *pvParameter) {
     int64_t time;
     ESP_ERROR_CHECK(sonar_run(&distance, &time));
 
-    distances[i - 1] = distance;
-    times[i - 1] = time;
+    distances[(i % LOGS_BEFORE_POST) - 1] = distance;
+    times[(i % LOGS_BEFORE_POST) - 1] = time;
     if (i % LOGS_BEFORE_POST == 0) {
       memcpy(req->sonar_data, distances, LOGS_BEFORE_POST * sizeof(float));
       memcpy(req->time, times, LOGS_BEFORE_POST * sizeof(int64_t));
@@ -39,6 +40,8 @@ void sensor_read(void *pvParameter) {
       ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
   }
+  esp_http_client_cleanup(req->client);
+  ESP_LOGI(TAG, "done");
   free(req);
   vTaskDelete(NULL);
 }

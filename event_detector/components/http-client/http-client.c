@@ -129,6 +129,7 @@ esp_err_t get_request(void) {
   return ret;
 }
 char *format_json(char *data) { return "hi"; }
+
 struct httpRequest *init_post(int logs_before_post) {
   esp_http_client_config_t config = {
       .url = SERVER_URL "/post",
@@ -136,9 +137,9 @@ struct httpRequest *init_post(int logs_before_post) {
       .method = HTTP_METHOD_POST,
       .disable_auto_redirect = true,
   };
+
   ESP_LOGI(TAG, "HTTP POST in JSON format");
   esp_http_client_handle_t client = esp_http_client_init(&config);
-  esp_http_client_set_header(client, "Content-Type", "application/json");
 
   struct httpRequest *req = malloc(sizeof(struct httpRequest));
   req->client = client;
@@ -151,8 +152,15 @@ void post_request(void *pvParameters) {
   // now can call the json formatting function and format data
   // for reference the function to get json obj into string is cJSON_Print
   char *post_req = "shit here";
+  static char hi[256];
+  float x = req->sonar_data[0];
+  sprintf(hi, "{\"sonar_reading\": %f}", x);
 
-  esp_http_client_set_post_field(client, post_req, strlen(post_req));
+  esp_http_client_set_method(client, HTTP_METHOD_POST);
+  esp_http_client_set_header(client, "Content-Type", "application/json");
+
+  esp_http_client_set_post_field(client, hi, strlen(hi));
+
   esp_err_t ret = esp_http_client_perform(client);
   if (ret == ESP_OK) {
     ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %" PRId64,
