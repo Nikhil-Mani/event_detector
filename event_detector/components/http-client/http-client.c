@@ -143,11 +143,11 @@ char *format_json(float *distances, int64_t *times, int size) {
 
     cJSON_AddItemToArray(data, dp);
 
-    distance = cJSON_CreateNumber(distances[i]);
-    cJSON_AddItemToObject(dp, "sonar_distance", distance);
-
     time = cJSON_CreateNumber(times[i]);
     cJSON_AddItemToObject(dp, "time", time);
+
+    distance = cJSON_CreateNumber(distances[i]);
+    cJSON_AddItemToObject(dp, "sonar_distance", distance);
   }
 
   return cJSON_Print(data);

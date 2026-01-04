@@ -75,8 +75,9 @@ esp_err_t sonar_run(float *distance_cm, int64_t *time) {
   }
   //  json not formatted!
   struct timeval cur_time;
-  gettimeofday(&cur_time, NULL);
-  int64_t t = (uint64_t)cur_time.tv_sec * 1000000L + (uint64_t)cur_time.tv_usec;
+  gettimeofday(&cur_time, NULL); // add in tz param
+  int64_t t =
+      ((uint64_t)cur_time.tv_sec * 1000000L) + (uint64_t)cur_time.tv_usec;
   duration = echo_end - echo_start;
   *time = t;
   *distance_cm = duration * SOUND_SPEED / 2;
