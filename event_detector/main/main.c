@@ -49,11 +49,4 @@ void sensor_read(void *pvParameter) {
 void app_main(void) {
   vTaskDelay(1);
   xTaskCreate(sensor_read, "sensor", 4096, NULL, 1, NULL);
-  //  also want this task, not sure how to format this but wtv
-
-  // xTaskCreate(post_request, "post", 4096, req, 1, NULL); // make sure to
-  //  remove the return type and itll compile int64_t duration; esp_err_t ret;
-  //  for (int i = 0; i < 300; i++) {
-  //    ret = sonar_run(&duration);
-  //  }
 }

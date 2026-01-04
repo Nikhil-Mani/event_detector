@@ -1,4 +1,5 @@
 #include "http-client.h"
+#include "cJSON.h"
 #include "esp_http_client.h"
 #include "esp_log.h"
 #include "esp_tls.h"
@@ -128,7 +129,29 @@ esp_err_t get_request(void) {
   esp_http_client_cleanup(client);
   return ret;
 }
-char *format_json(char *data) { return "hi"; }
+char *format_json(float *distances, int64_t *times, int size) {
+  cJSON *json = cJSON_CreateObject();
+
+  cJSON *data = cJSON_CreateArray();
+
+  cJSON_AddItemToObject(json, "data", data);
+  cJSON *dp = NULL;
+  cJSON *distance = NULL;
+  cJSON *time = NULL;
+  for (int i = 0; i < size; i++) {
+    dp = cJSON_CreateObject();
+
+    cJSON_AddItemToArray(data, dp);
+
+    distance = cJSON_CreateNumber(distances[i]);
+    cJSON_AddItemToObject(dp, "sonar_distance", distance);
+
+    time = cJSON_CreateNumber(times[i]);
+    cJSON_AddItemToObject(dp, "time", time);
+  }
+
+  return cJSON_Print(data);
+}
 
 struct httpRequest *init_post(int logs_before_post) {
   esp_http_client_config_t config = {
@@ -151,7 +174,7 @@ void post_request(void *pvParameters) {
   esp_http_client_handle_t client = req->client;
   // now can call the json formatting function and format data
   // for reference the function to get json obj into string is cJSON_Print
-  char *post_req = "shit here";
+  // char *post_req = "shit here";
   static char hi[256];
   float x = req->sonar_data[0];
   sprintf(hi, "{\"sonar_reading\": %f}", x);
