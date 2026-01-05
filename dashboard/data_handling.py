@@ -44,6 +44,14 @@ def add_data(data: list[Entry])->None:
     con.commit()
     con.close()
 
+def read_data():
+    con = sqlite3.connect("data/sonar.db")
+    cur = con.cursor()
+    for row in cur.execute("SELECT time, distance FROM sonar"):
+        print(row)
+
 def handle_data(data):
-    init_db()
+    #init_db()
     add_data(data)
+
+read_data()

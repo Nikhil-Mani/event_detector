@@ -175,14 +175,12 @@ void post_request(void *pvParameters) {
   // now can call the json formatting function and format data
   // for reference the function to get json obj into string is cJSON_Print
   // char *post_req = "shit here";
-  static char hi[256];
-  float x = req->sonar_data[0];
-  sprintf(hi, "{\"sonar_reading\": %f}", x);
+  char *post_req = format_json(req->sonar_data, req->times, LOGS_BEFORE_POST);
 
   esp_http_client_set_method(client, HTTP_METHOD_POST);
   esp_http_client_set_header(client, "Content-Type", "application/json");
 
-  esp_http_client_set_post_field(client, hi, strlen(hi));
+  esp_http_client_set_post_field(client, post_req, strlen(post_req));
 
   esp_err_t ret = esp_http_client_perform(client);
   if (ret == ESP_OK) {

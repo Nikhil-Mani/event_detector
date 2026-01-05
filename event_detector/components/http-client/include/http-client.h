@@ -6,7 +6,7 @@
 struct httpRequest {
   esp_http_client_handle_t client;
   float sonar_data[LOGS_BEFORE_POST];
-  int64_t time[LOGS_BEFORE_POST];
+  int64_t times[LOGS_BEFORE_POST];
   TaskHandle_t parent_task;
 };
 esp_err_t _http_event_handler(esp_http_client_event_t *evt);

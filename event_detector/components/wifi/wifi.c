@@ -1,5 +1,7 @@
 #include "esp_event.h"
 #include "esp_log.h"
+#include "esp_netif_sntp.h"
+#include "esp_sntp.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
@@ -147,4 +149,38 @@ void init_wifi(void) {
 
   ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
   wifi_init_sta();
+}
+
+void obtain_time(void) {
+  esp_sntp_config_t config = ESP_NETIF_SNTP_DEFAULT_CONFIG("time.google.com");
+  esp_netif_sntp_init(&config);
+  time_t now = 0;
+  struct tm timeinfo = {0};
+  int retry = 0;
+  const int retry_count = 15;
+  while (esp_netif_sntp_sync_wait(2000 / portTICK_PERIOD_MS) ==
+             ESP_ERR_TIMEOUT &&
+         ++retry < retry_count) {
+    ESP_LOGI(TAG, "Waiting for system time to be set... (%d/%d)", retry,
+             retry_count);
+  }
+  time(&now);
+  localtime_r(&now, &timeinfo);
+}
+void init_time(void) {
+  time_t now;
+  struct tm timeinfo;
+
+  time(&now);
+  // Set timezone to China Standard Time
+  setenv("TZ", "America/New_York", 1);
+  tzset();
+
+  localtime_r(&now, &timeinfo);
+  if (timeinfo.tm_year < (2016 - 1900)) {
+    ESP_LOGI(TAG, "Time is not set yet. Getting time over NTP.");
+    obtain_time();
+    // update 'now' variable with current time
+    time(&now);
+  }
 }
