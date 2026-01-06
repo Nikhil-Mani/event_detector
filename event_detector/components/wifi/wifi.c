@@ -172,8 +172,9 @@ void init_time(void) {
   struct tm timeinfo;
 
   time(&now);
-  // Set timezone to China Standard Time
-  setenv("TZ", "America/New_York", 1);
+  ESP_LOGI(TAG, "%s", ctime(&now));
+  // Set timezone to EST
+  setenv("TZ", "EST5EDT", 1);
   tzset();
 
   localtime_r(&now, &timeinfo);
@@ -182,5 +183,6 @@ void init_time(void) {
     obtain_time();
     // update 'now' variable with current time
     time(&now);
+    ESP_LOGI(TAG, "%s", ctime(&now));
   }
 }

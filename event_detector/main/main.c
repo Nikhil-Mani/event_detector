@@ -27,13 +27,13 @@ void sensor_read(void *pvParameter) {
   TaskHandle_t t = xTaskGetCurrentTaskHandle();
 
   req->parent_task = t;
-  for (int i = 1; i < 30; i++) {
+  for (int i = 0; i < 100; i++) {
     float distance;
     int64_t time;
     ESP_ERROR_CHECK(sonar_run(&distance, &time));
-    ESP_LOGI(TAG, "%llu", time);
-    distances[(i % LOGS_BEFORE_POST) - 1] = distance;
-    times[(i % LOGS_BEFORE_POST) - 1] = time;
+    ESP_LOGI(TAG, "%f", distance);
+    distances[(i % LOGS_BEFORE_POST)] = distance;
+    times[(i % LOGS_BEFORE_POST)] = time;
     if (i % LOGS_BEFORE_POST == 0) {
       memcpy(req->sonar_data, distances, LOGS_BEFORE_POST * sizeof(float));
       memcpy(req->times, times, LOGS_BEFORE_POST * sizeof(int64_t));

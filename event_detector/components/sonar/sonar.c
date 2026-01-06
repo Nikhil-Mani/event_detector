@@ -69,7 +69,7 @@ esp_err_t sonar_run(float *distance_cm, int64_t *time) {
   int64_t timeout = esp_timer_get_time() + 40000;
   while (!echo_done) {
     if (esp_timer_get_time() > timeout) {
-      return ESP_ERR_TIMEOUT;
+      duration = -1;
     }
     vTaskDelay(1);
   }

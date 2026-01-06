@@ -55,3 +55,5 @@ def handle_data(data):
     add_data(data)
 
 read_data()
+
+# have to delete all of 1767716333 and 1767716433
