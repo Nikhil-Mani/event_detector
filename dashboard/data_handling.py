@@ -1,6 +1,7 @@
 import sqlite3
 from typing import TypedDict
 from datetime import date, time, datetime
+from door import Door
 
 
 class Entry(TypedDict):
@@ -36,13 +37,15 @@ def format_time(data)-> list[datetime]:
     return datetimes
 
 
-def add_data(data: list[Entry])->None:
+def add_data(data: list[Entry], obj: Door)->None:
     con = sqlite3.connect("data/sonar.db")
     cur = con.cursor()
     for entry in data:
         cur.execute("INSERT INTO sonar VALUES(?,?)",(entry["time"], entry["sonar_distance"]))
     con.commit()
     con.close()
+    sonar = [d["sonar_distance"] for d in data]
+    obj.add_data(sonar)
 
 def read_data():
     con = sqlite3.connect("data/sonar.db")
@@ -52,7 +55,8 @@ def read_data():
 
 def handle_data(data):
     #init_db()
-    add_data(data)
+    x = Door()
+    add_data(data, x)
 
 read_data()
 

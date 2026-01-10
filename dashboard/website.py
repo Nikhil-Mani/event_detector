@@ -2,8 +2,9 @@ from flask import Flask, request, jsonify
 from data_handling import handle_data
 app = Flask(__name__)
 
-@app.route('/')
-def hello_world():
+@app.route('/get')
+def return_data():
+    # add return data here
     return '<h1>Hello World! This is my first Python Website.</h1>'
 
 

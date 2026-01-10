@@ -1,6 +1,8 @@
 import statistics
+
 val_constant = 0.8
 avg_constant = 0.2
+
 class Door:
     def __init__(self):
         self.low_boundary = 1000
@@ -26,11 +28,12 @@ class Door:
         else:
             self.low_boundary = self.low_boundary * val_constant + avg_constant * avg
             self.high_boundary = self.high_boundary * val_constant + avg_constant * avg
-        return self.state
+        
     """
     if the lower boundary is lower than the lower end of the standard deviation:
         - means the new average is probably the higher boundary
     if the lowe rboundary is higher than the higher end:
         - means that its closer to high boundary
     """
-       
+    def get_state(self):
+        return self.state
