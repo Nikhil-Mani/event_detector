@@ -37,8 +37,8 @@ void sensor_read(void *pvParameter) {
     if (i % LOGS_BEFORE_POST == 0) {
       memcpy(req->sonar_data, distances, LOGS_BEFORE_POST * sizeof(float));
       memcpy(req->times, times, LOGS_BEFORE_POST * sizeof(int64_t));
-      // xTaskCreate(post_request, "post", 4096, req, 1, NULL);
-      // ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+      xTaskCreate(post_request, "post", 4096, req, 1, NULL);
+      ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
   }
   esp_http_client_cleanup(req->client);
