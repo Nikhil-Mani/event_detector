@@ -53,10 +53,9 @@ def read_data():
     for row in cur.execute("SELECT time, distance FROM sonar"):
         print(row)
 
-def handle_data(data):
+def handle_data(data, d):
     #init_db()
-    x = Door()
-    add_data(data, x)
+    add_data(data, d)
 
 read_data()
 

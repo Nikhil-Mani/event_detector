@@ -170,7 +170,6 @@ void obtain_time(void) {
 void init_time(void) {
   time_t now;
   struct tm timeinfo;
-
   time(&now);
   ESP_LOGI(TAG, "%s", ctime(&now));
   // Set timezone to EST
