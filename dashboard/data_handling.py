@@ -41,6 +41,9 @@ def add_data(data: list[Entry], obj: Door)->None:
     con = sqlite3.connect("data/sonar.db")
     cur = con.cursor()
     for entry in data:
+        print('hello')
+        print(entry['time'])
+        print(entry['sonar_distance'])
         cur.execute("INSERT INTO sonar VALUES(?,?)",(entry["time"], entry["sonar_distance"]))
     con.commit()
     con.close()
@@ -55,8 +58,8 @@ def read_data():
 
 def handle_data(data, d):
     #init_db()
-    add_data(data, d)
+    #add_data(data, d)
+    print(data)
 
-read_data()
 
 # have to delete all of 1767716333 and 1767716433

@@ -1,10 +1,10 @@
-# Pantry Door Monitor
+# Door Monitor
 
-An ESP32-based IoT system for real-time pantry door state detection using ultrasonic sensors and statistical classification.
+An ESP32-based IoT system for real-time door state detection using ultrasonic sensors and statistical classification.
 
 ## Overview
 
-This project monitors pantry door activity by analyzing sonar distance measurements from an HC-SR04 ultrasonic sensor. A Flask backend processes raw sensor data, applies moving average smoothing, and classifies door states (open/closed) which are stored in SQLite for historical tracking and analysis.
+This project monitors door activity by analyzing sonar distance measurements from an HC-SR04 ultrasonic sensor. A Flask backend processes raw sensor data, applies moving average smoothing, and classifies door states (open/closed) which are stored in SQLite for historical tracking and analysis.
 
 ## Hardware
 
@@ -27,27 +27,32 @@ The door state detection uses a moving average approach:
 
 1. **Data collection**: HC-SR04 outputs distance measurements
 2. **Smoothing**: Moving average filter reduces sensor noise
-3. **Classification**: Distance thresholds determine open/closed states (calibrated during setup)
+3. **Classification**: Adaptive thresholding algorithm determines open/closed states 
 4. **Persistence**: States and raw data logged to SQLite
 
 This statistical approach avoids over-fitting to individual measurements while capturing genuine state changes.
+## Simulation
+
+To actively develop the project despite not having access to the hardware, a simulation of sonar data sending was necessary. It works based off of EDA which determined that the average noise had a range of 7.
 
 ## Project Status
 
 This is an actively developed project. Current focus areas include:
 - Refining door state detection algorithm performance
 - Analyzing stored sensor data for classification accuracy
-- Testing sensor reliability across different pantry conditions
+- Testing sensor reliability across different conditions
 
 ## File Structure
 
 ```
 ├── esp32_firmware/          # ESP32 code (C++)
-├── flask_backend/
+├── dashboard/
 │   ├── app.py              # Flask server and classification logic
-│   └── requirements.txt
+│   └── data_handling.py    # Data handling
+│   └── door.py             # Door class and threshold algorithm
+│   └── sim.py              # Simulating sensor data
 ├── data/
-│   └── pantry.db           # SQLite database
+│   └── sonar.db           # SQLite database
 └── README.md
 ```
 
