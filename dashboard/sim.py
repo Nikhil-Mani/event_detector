@@ -27,7 +27,7 @@ class Simulation:
         self.state = False # True is open, closed is False
         self.url = url
         self.time_until_switch = rand.randint(3, 8)
-        self.vals = closed_vals
+        self.val = rand.choice(closed_vals)
         self.http = HTTP(self.url)
     def gen_sonar(self,val):
         return rand.uniform(val-(self.spread/2), val+(self.spread/2))
@@ -39,15 +39,15 @@ class Simulation:
     def flip_state(self):
         self.state = not self.state
         if(self.state):
-            self.vals = open_vals
+            self.val = rand.choice(open_vals)
         else: 
-            self.vals = closed_vals
+            self.val = rand.choice(closed_vals)
         self.time_until_switch = rand.randint(3, 8)
 
     def gen_post(self):
         data = []
         for i in range(5):
-            data.append({"sonar_distance": f"{self.gen_sonar(rand.choice(self.vals[0]), self.spread)}", "time" : f"{self.gen_time()}"})
+            data.append({"sonar_distance": f"{self.gen_sonar(self.val)}", "time" : f"{self.gen_time()}"})
         self.http.post_data(data)
 
     def step(self):
