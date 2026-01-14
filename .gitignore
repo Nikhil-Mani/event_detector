@@ -1,3 +1,4 @@
 */build/
 */myenv/
-dashboard/data/sonar.db
+dashboard/data/*.db
+dashboard/testing.py

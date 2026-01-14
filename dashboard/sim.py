@@ -7,24 +7,29 @@ import json
 # this code works based off that assumption 
 
 closed_vals = [12, 30] # these are the values it should roughly take on when closed, depending on position
-range = 2
-def gen_sonar(val, range):
-    return rand.uniform(val-(range/2), val+(range/2))
+r = 2
+def gen_sonar(val, spread):
+    return rand.uniform(val-(spread/2), val+(spread/2))
 
 def gen_time():
     t = datetime.now().time()
     return (t.hour * 3600 + t.minute * 60 + t.second) * 1000000 + t.microsecond
-
+def gen_post(val, r):
+    data = []
+    for i in range(5):
+        data.append({"sonar_distance": f"{gen_sonar(val, r)}", "time" : f"{gen_time()}"})
+    return data
 class HTTP:
     def __init__(self, url: str):
         self.url = url
         self.conn = http.client.HTTPConnection(url)
         self.headers  = {"Content-Type": "application/json"}
+    
     def post_data(self, data: list[dict]):
         self.conn.request("POST", "/post", json.dumps(data), self.headers)
         response = self.conn.getresponse()
         print(response.status, response.reason)
 
 x = HTTP("10.203.116.51:5001")
-data = [{"sonar_distance": f"{gen_sonar(closed_vals[0], range)}", "time" : f"{gen_time()}" }]
+data = gen_post(closed_vals[0], r)
 x.post_data(data)

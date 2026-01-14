@@ -10,7 +10,7 @@ class Entry(TypedDict):
 
 # Initializes database with sonar table
 def init_db() -> None:
-    con = sqlite3.connect("data/sonar.db")
+    con = sqlite3.connect("data/sim.db")
     cur = con.cursor()
     # Checks if database already exists
     try:
@@ -38,7 +38,7 @@ def format_time(data)-> list[datetime]:
 
 
 def add_data(data: list[Entry], obj: Door)->None:
-    con = sqlite3.connect("data/sonar.db")
+    con = sqlite3.connect("data/sim.db")
     cur = con.cursor()
     for entry in data:
         print('hello')
@@ -48,17 +48,25 @@ def add_data(data: list[Entry], obj: Door)->None:
     con.commit()
     con.close()
     sonar = [d["sonar_distance"] for d in data]
-    obj.add_data(sonar)
+    print(sonar)
+    # obj.add_data(sonar)
 
 def read_data():
-    con = sqlite3.connect("data/sonar.db")
+    con = sqlite3.connect("data/sim.db")
     cur = con.cursor()
     for row in cur.execute("SELECT time, distance FROM sonar"):
         print(row)
 
+def clear_data():
+    con = sqlite3.connect("data/sim.db")
+    cur = con.cursor()
+    cur.execute("DELETE FROM sonar")
+    con.commit()
+    cur.close()
+
 def handle_data(data, d):
-    #init_db()
-    #add_data(data, d)
+    # init_db()
+    add_data(data, d)
     print(data)
 
 
