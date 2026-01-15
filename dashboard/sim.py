@@ -22,13 +22,14 @@ class HTTP:
 
 class Simulation:
 
-    def __init__(self, spread, url):
+    def __init__(self, spread, url, single=-1):
         self.spread = spread
         self.state = False # True is open, closed is False
         self.url = url
         self.time_until_switch = rand.randint(3, 8)
         self.val = rand.choice(closed_vals)
         self.http = HTTP(self.url)
+        self.single = single # if we are using a single val from the vals array or not
     def gen_sonar(self,val):
         return rand.uniform(val-(self.spread/2), val+(self.spread/2))
     
@@ -38,10 +39,16 @@ class Simulation:
     
     def flip_state(self):
         self.state = not self.state
-        if(self.state):
-            self.val = rand.choice(open_vals)
-        else: 
-            self.val = rand.choice(closed_vals)
+        if self.single > 0:
+            if(self.state):
+                self.val = open_vals[self.single]
+            else: 
+                self.val = closed_vals[self.single]
+        else:
+            if(self.state):
+                self.val = rand.choice(open_vals)
+            else: 
+                self.val = rand.choice(closed_vals)
         self.time_until_switch = rand.randint(3, 8)
 
     def gen_post(self):
@@ -57,7 +64,9 @@ class Simulation:
             self.flip_state()
             self.gen_post()
 
-sim = Simulation(r, "10.203.116.51:5001")
+sim = Simulation(r, "10.203.116.51:5001", 0)
+
 for i in range(100):
     sim.step()
     time.sleep(.001)
+

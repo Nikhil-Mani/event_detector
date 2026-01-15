@@ -18,7 +18,6 @@ def recv_data() -> tuple[dict, int]:
     if data is None:
         return jsonify({"error": "Invalid JSON"}), 400
     try:
-        print(data)
         handle_data(data, door)
         ret = {"message": "Request successful", "status": "ok"}
         return jsonify(ret), 200

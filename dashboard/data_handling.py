@@ -41,15 +41,17 @@ def add_data(data: list[Entry], obj: Door)->None:
     con = sqlite3.connect("data/sim.db")
     cur = con.cursor()
     for entry in data:
-        print('hello')
-        print(entry['time'])
-        print(entry['sonar_distance'])
+        # print('hello')
+        # print(entry['time'])
+        # print(entry['sonar_distance'])
         cur.execute("INSERT INTO sonar VALUES(?,?)",(entry["time"], entry["sonar_distance"]))
     con.commit()
     con.close()
     sonar = [d["sonar_distance"] for d in data]
+    print("---sonar here---")
     print(sonar)
-    # obj.add_data(sonar)
+    obj.add_data(sonar)
+    # print(obj.get_state())
 
 def read_data():
     con = sqlite3.connect("data/sim.db")
