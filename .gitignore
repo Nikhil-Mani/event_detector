@@ -2,3 +2,4 @@
 */myenv/
 dashboard/data/*.db
 dashboard/testing.py
+dashboard/__pycache__
